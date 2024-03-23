@@ -65,7 +65,7 @@ class AboutState extends State<About> {
             children: [
               Container(
                 color: Color.fromARGB(15, 0, 0, 0),
-                child: Padding(
+                child: const Padding(
                   padding: EdgeInsets.all(30),
                   child: Text(
                     "Bilembo Ya béton a été développer  par la startup D-Corp Siégeant a Goma/NK  qui développe des solutions informatiques optimiser comme des logiciels de gestion d’entreprise, des applications mobiles et le site internet.",

@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:bilembo/about.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:share/share.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -70,6 +74,59 @@ class _VideoListState extends State<VideoList> {
         ),
       )
       .toList();
+  RewardedAd? _rewardedAd;
+
+  final String _adUnitId = Platform.isAndroid
+      ? 'ca-app-pub-7329797350611067/4191692802'
+      : 'ca-app-pub-7329797350611067/4191692802';
+  final CountdownTimer _countdownTimer = CountdownTimer(10);
+//Id app ca-app-pub-3940256099942544~3347511713
+  @override
+  void initState() {
+    super.initState();
+
+    _countdownTimer.addListener(() => setState(() {
+          _rewardedAd?.show(
+              onUserEarnedReward: (AdWithoutView ad, RewardItem rewardItem) {
+            // ignore: avoid_print
+          });
+        }));
+    _startNewGame();
+  }
+  void _loadAd() {
+    setState(() {
+      RewardedAd.load(
+          adUnitId: _adUnitId,
+          request: const AdRequest(),
+          rewardedAdLoadCallback: RewardedAdLoadCallback(onAdLoaded: (ad) {
+            ad.fullScreenContentCallback = FullScreenContentCallback(
+                // Called when the ad showed the full screen content.
+                onAdShowedFullScreenContent: (ad) {},
+                // Called when an impression occurs on the ad.
+                onAdImpression: (ad) {},
+                // Called when the ad failed to show full screen content.
+                onAdFailedToShowFullScreenContent: (ad, err) {
+                  ad.dispose();
+                },
+                // Called when the ad dismissed full screen content.
+                onAdDismissedFullScreenContent: (ad) {
+                  ad.dispose();
+                },
+                // Called when a click is recorded for an ad.
+                onAdClicked: (ad) {});
+
+            // Keep a reference to the ad so you can show it later.
+            _rewardedAd = ad;
+          }, onAdFailedToLoad: (LoadAdError error) {
+            // ignore: avoid_print
+            print('RewardedAd failed to load: $error');
+          }));
+    });
+  }
+  void _startNewGame() {
+    _loadAd();
+    _countdownTimer.start();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +143,11 @@ class _VideoListState extends State<VideoList> {
         ),
         title: const Text(
           'Bilembo ya beton',
-          style: TextStyle(color: Colors.black,fontSize: 19),
+          style: TextStyle(color: Colors.black, fontSize: 19),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share,color: Colors.black),
+            icon: const Icon(Icons.share, color: Colors.black),
             onPressed: () {
               Share.share(
                   'https://play.google.com/store/apps/details?id=com.bilembo');
