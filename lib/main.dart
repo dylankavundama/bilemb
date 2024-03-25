@@ -3,9 +3,28 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bilembo/Home.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
-void main() => runApp(const App());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Future.delayed(const Duration(seconds: 1));
+
+  OneSignal.shared.setAppId("c2f6248a-3c61-4381-a341-c6aa815cca8d");
+
+  OneSignal.shared.setNotificationWillShowInForegroundHandler(
+      (OSNotificationReceivedEvent event) {});
+  OneSignal.shared
+      .promptUserForPushNotificationPermission()
+      .then((accepted) {});
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
